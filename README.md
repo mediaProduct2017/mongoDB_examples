@@ -48,6 +48,21 @@ The data exchanged between pymongo and mongoDB is in a form called BSON, the bin
         db.cities.insert({"name" : "Chicago"})
         
     db.autos.insert(tesla_s)
+    
+更新
+
+    def main():
+        city = db.cities.find_one({"country": "Germany"})
+        city["isoCountryCode"] = "deu"
+        db.cities.save(city)
+        
+    def main():
+        db.cities.update({"country": "Germany"}, {"$set": {"isoCountryCode": "deu"}}, multi=True)
+        
+删除数据
+
+    db.cities.remove()  # delete one by one
+    db.citeis.drop()  # delete the entire collection at once
         
 查询数据
 
@@ -77,11 +92,48 @@ The data exchanged between pymongo and mongoDB is in a form called BSON, the bin
     
 pymongo 中的批量插入
 
-    [pymongo 3.0](http://api.mongodb.com/python/current/tutorial.html#bulk-inserts)
-    
-    [pymongo 2.8](http://api.mongodb.com/python/2.8/tutorial.html#bulk-inserts)
+[pymongo 3.0](http://api.mongodb.com/python/current/tutorial.html#bulk-inserts)
+
+[pymongo 2.8](http://api.mongodb.com/python/2.8/tutorial.html#bulk-inserts)
     
 在命令行使用mongoimport
 
     mongoimport -d examples -c autos --file autos.json
     
+    -d: database
+
+    -c: collection
+
+range operation
+
+    query = {"population": {"$gt": 250000, "lte": 500000}}
+    cities = db.cityies.find(query)
+    
+    query = {"foundingDate": {"gt": datetime(1837, 1, 1), "lte": datetime(1837, 12, 31)}}
+    
+Swith database
+
+    use examples
+    
+exists operator and pretty printer
+
+    db.cities.find({"govermentType": {"$exists": 1}}).pretty()
+
+正则运算符用于查询
+
+    db.cities.find({"motto": {"$regex": "[Ff]riendship|[Hh]appiness"}})
+    
+In operator: the field contains any item within the in operator
+
+    db.autos.find({"ModelYear": {"$in": [1956, 1957, 1958]}})
+    
+All operator: the field contains all the items within the all operator
+
+    db.autos.find({"ModelYear": {"$all": [1956, 1957, 1958]}})
+    
+dot representation
+
+    db.autos.find({"dimentions.weight": {"$gt": 5000}})
+    db.tweets.find("entities.hashtags": {"$ne": []}}, {"entities.hashtags.text": 1, "_id": 0})
+    
+## The aggregation framework
