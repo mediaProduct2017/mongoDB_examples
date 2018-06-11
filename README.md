@@ -137,3 +137,43 @@ dot representation
     db.tweets.find("entities.hashtags": {"$ne": []}}, {"entities.hashtags.text": 1, "_id": 0})
     
 ## The aggregation framework
+
+aggregation pipeline
+
+    def most_tweets():
+        res = db.tweets.aggragate([
+            {"$group": {"_id": "$user.screenname",  
+            # group operation, the operation key is user.screenname
+                  "count": {"$sum": 1}}},  # accumulation (sum) operation to get count
+            {"$sort": {"count": -1}}])  # -1 means descending order
+        return res
+        # return an iterator
+        
+[Aggregation Pipeline Operators](https://docs.mongodb.com/manual/reference/operator/aggregation/)
+
+In the current version of pymongo (3.0), aggregation operations return a cursor object. In order to see the elements returned, you can iterate over the cursor object, such as using a for loop, and print out the elements one by one. 
+
+[pipeline operators and project operator](https://docs.mongodb.com/manual/reference/operator/aggregation/project/#pipe._S_project)
+
+    $project
+    
+    $match
+    
+    def highest_ratio():
+        res = db.tweets.aggragate([
+        {"$match": {"user.friends_count": {"$gt": 0},
+                    "user.followers_count": {"$gt": 0}}},
+         # a filter operator
+        {"$project": {"ratio": {"$divide": ["$user.followers_count", "$user.friends_count"]},
+                      "screen_name": $user.screen_name}},
+         # a shaping operator
+        {"$sort": {"ratio": -1}},
+        {"$limit": 1}])
+        return res
+    
+    $skip
+    
+    $limit
+    
+    $unwind
+    
