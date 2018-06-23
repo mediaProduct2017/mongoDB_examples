@@ -140,6 +140,8 @@ dot representation
 
 aggregation pipeline
 
+    $group: $sum, $first, $last, $min, $max, $avg
+
     def most_tweets():
         res = db.tweets.aggragate([
             {"$group": {"_id": "$user.screenname",  
@@ -176,4 +178,59 @@ In the current version of pymongo (3.0), aggregation operations return a cursor 
     $limit
     
     $unwind
+    
+    def user_mentions():
+        res = db.tweets.aggragate([
+        {"$unwind": "entities.user_mentions"},
+        # 把内部的一个array展开，其后往往紧跟$group，对展开后的值进行聚合处理
+        {"$group": {"_id": "$entities.user_mentions.screenname", 
+                    "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 1}]) 
+        return res
+    
+    $addToSet
+    
+    def user_mentions():
+        res = db.tweets.aggragate([
+        {"$unwind": "entities.user_mentions"},
+        # 把内部的一个array展开，其后往往紧跟$group，对展开后的值进行聚合处理
+        {"$group": {"_id": "$user.screenname", 
+        "unique_metions": {"$addToSet: "$entities.user_mentions.screenname"}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 1}]) 
+        return res
+        
+Who has mentioned the most unique users?
+
+    def unique_user_mentions():
+        res = db.tweets.aggragate([
+        {"$unwind": "entities.user_mentions"},
+        # 把内部的一个array展开，generate one document for every item in the array
+        {"$group": {"_id": "$user.screenname", 
+        "unique_metions": {"$addToSet: "$entities.user_mentions.screenname"}}},
+        {"$unwind": "$unique_metions"},
+        {"$group": {"_id": "$_id", 
+        "count": {"$sum: 1}}},        
+        {"$sort": {"count": -1}},
+        {"$limit": 10}]) 
+        return res
+    
+Indexes
+
+    db.nodes.find().pretty()
+    
+    db.nodes.ensureIndex({"tg":1})
+    
+[Learn MongoDB from MongoDB -- mongodb university](https://university.mongodb.com/)
+
+[Indexes -- mongodb documentation](https://docs.mongodb.com/manual/indexes/)
+
+geospacial indexes
+
+    db.nodes.ensureIndex([("loc", pymongo.GEO2D)])
+    
+    db.nodes.find({"loc": {"$near": [41.9, -87.6]}, "tag": {"$exist": 1}}).pretty()
+    
+    
     
