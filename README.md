@@ -226,11 +226,17 @@ Indexes
 
 [Indexes -- mongodb documentation](https://docs.mongodb.com/manual/indexes/)
 
+index可以建立一维的，也可以建立多维的，多维是有顺序的。
+
 geospacial indexes
 
     db.nodes.ensureIndex([("loc", pymongo.GEO2D)])
     
     db.nodes.find({"loc": {"$near": [41.9, -87.6]}, "tag": {"$exist": 1}}).pretty()
     
-    
+near operator本质上就是在处理高维情况下的similarity search，当然，在二维情况下并不是很复杂，但也不能简单用贪婪算法一个坐标一个坐标的看，如果是非常高维的情况，就更加复杂，比如gensim中的寻找相似度最近文档的函数。
+
+[Data Wrangling with mongodb](https://classroom.udacity.com/courses/ud032)
+
+课的名称可能会发生变化，用来增加噪音，但内容应该不会变。
     
