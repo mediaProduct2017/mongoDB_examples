@@ -14,6 +14,8 @@ Aggregation framework
 
 ## 使用mongoDB
 
+[nlp/nlp_models/mongodb](https://github.com/arfu2016/nlp/tree/master/nlp_models/mongodb)
+
 安装mongoDB
 
 [Install MongoDB](https://docs.mongodb.com/manual/installation/)
